@@ -104,3 +104,9 @@ dont_do_this_df <- read.csv("data/FAS_litters.csv")
 ```
 
 `read_csv` vs `read.csv`: `read.csv` is not a good thing to use (weird columns, etc.)
+
+
+## Gitignore
+
+Can use this to specify if there are certain files / datasets that you don't want to include in github. 
+Use for data that you don't ever want to save and update on github. 
