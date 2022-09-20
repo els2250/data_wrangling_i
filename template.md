@@ -202,3 +202,52 @@ read_csv("data/FAS_litters.csv", skip = 2)
 considered ‘character’ or ‘double’ (numeric) when imported
 
 ## Other file formats
+
+We need to read in an excel spreadsheet …
+
+``` r
+mlb_df <- read_excel("data/mlb11.xlsx")
+```
+
+``` r
+view(mlb_df)
+```
+
+``` r
+lotr_words_df = 
+  read_excel(
+    "data/LotR_Words.xlsx",
+    range = "B3:D6")
+```
+
+## Still more formats
+
+Read in a SAS dataset.
+
+``` r
+pulse_df <- read_sas("data/public_pulse_data.sas7bdat")
+```
+
+## Data export
+
+Using relative paths in the same way that you import.
+
+``` r
+write_csv(lotr_words_df, file = "data/lotr_words_df.csv")
+```
+
+If you want to add to a new folder \> you need to create the new folder
+first.
+
+``` r
+write_csv(lotr_words_df, file = "results/lotr_words_df.csv")
+```
+
+## Why not base r???
+
+``` r
+dont_do_this_df <- read.csv("data/FAS_litters.csv")
+```
+
+`read_csv` vs `read.csv`: `read.csv` is not a good thing to use (weird
+columns, etc.)
