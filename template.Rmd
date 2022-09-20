@@ -5,6 +5,7 @@ output: github_document
 
 ```{r, echo = FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 ## Data Import: CSVs
@@ -55,4 +56,30 @@ Update a column type if the dataset was incorrectly considered 'character' or 'd
 
 
 ## Other file formats
+
+We need to read in an excel spreadsheet ...
+
+```{r}
+mlb_df <- read_excel("data/mlb11.xlsx")
+```
+
+```{r, eval = FALSE}
+view(mlb_df)
+```
+
+```{r}
+lotr_words_df = 
+  read_excel(
+    "data/LotR_Words.xlsx",
+    range = "B3:D6")
+```
+
+
+## Still more formats
+
+Read in a SAS dataset.
+
+```{r}
+
+```
 
