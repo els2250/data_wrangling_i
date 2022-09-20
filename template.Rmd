@@ -3,4 +3,56 @@ title: "Data Import"
 output: github_document
 ---
 
+```{r, echo = FALSE}
+library(tidyverse)
+```
+
 ## Data Import: CSVs
+
+Let's import data using the `readr` package.
+```{r}
+litters_df <- read_csv("data/FAS_litters.csv")
+litters_df <- janitor::clean_names(litters_df)
+# converts all names to snake case
+```
+NOTE: Give relative paths - that's why R projects are so helpful. You can start giving relative paths from the R project and send the R project so the code works for everyone. 
+
+Janitor Package: we don't need this entirely; we just need the `clean_names` function. So, we just call on the package when we need it. Don't have to load it completely. 
+`clean_names` converts all variable names to snake case. 
+
+
+#### First thing to do: *Look at the data*
+
+```{r}
+litters_df
+
+head(litters_df)
+tail(litters_df)
+```
+
+```{r, eval = FALSE}
+view(litters_df)
+```
+
+```{r}
+skimr::skim(litters_df)
+```
+
+
+#### `read_csv` options ...
+Setting your missing values:
+```{r}
+read_csv("data/FAS_litters.csv", na = c("", "NA", 999, 88))
+```
+
+Skip the first two rows:
+```{r}
+read_csv("data/FAS_litters.csv", skip = 2)
+```
+
+`col_types`:
+Update a column type if the dataset was incorrectly considered 'character' or 'double' (numeric) when imported
+
+
+## Other file formats
+
