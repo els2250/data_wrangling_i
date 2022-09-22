@@ -3,26 +3,82 @@ title: "Data Manipulation with `dplyr`"
 output: github_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Once you've imported data, you're going to need to do some cleaning up. 
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collaps = TRUE,
+  fig.width = 6,
+  fig.asp = 6,
+  out.width = "90%"
+)
+# changes how it knits to markdown
 ```
 
-## R Markdown
+## Overview
+```{r}
+library(tidyverse)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+options(tibble.print_min = 3)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+litters_data <- read_csv("./data/FAS_litters.csv")
+litters_data <- janitor::clean_names(litters_data)
 
-```{r cars}
-summary(cars)
+pups_data <- read_csv("./data/FAS_pups.csv",
+  col_types = "ciiiii")
+pups_data <- janitor::clean_names(pups_data)
 ```
 
-## Including Plots
+### `select`
 
-You can also embed plots, for example:
+You can specify the columns you want to keep by naming all of them:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+select(litters_data, group, litter_number, gd0_weight, pups_born_alive)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+You can specify a range of columns to keep:
+
+```{r}
+select(litters_data, group:gd_of_birth)
+```
+
+You can also specify columns you’d like to remove:
+
+```{r}
+select(litters_data, -pups_survive)
+```
+
+You can rename variables as part of this process:
+
+```{r}
+select(litters_data, GROUP = group, LiTtEr_NuMbEr = litter_number)
+```
+
+If all you want to do is rename something, you can use `rename` instead of `select`. This will rename the variables you care about, and keep everything else:
+
+```{r}
+rename(litters_data, GROUP = group, LiTtEr_NuMbEr = litter_number)
+
+```
+
+There are some handy helper functions for select; read about all of them using ?select_helpers. I use starts_with(), ends_with(), and contains() often, especially when there variables are named with suffixes or other standard patterns:
+
+```{r}
+select(litters_data, starts_with("gd"))
+```
+
+I also frequently use is everything(), which is handy for reorganizing columns without discarding anything:
+
+```{r}
+select(litters_data, litter_number, pups_survive, everything())
+```
+
+`relocate` does a similar thing (and is sort of like rename in that it’s handy but not critical):
+
+```{r}
+relocate(litters_data, litter_number, pups_survive)
+```
+
+
+### `filter`
