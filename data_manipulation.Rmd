@@ -82,3 +82,99 @@ relocate(litters_data, litter_number, pups_survive)
 
 
 ### `filter`
+
+Some ways you might filter the litters data are:
+
+* `gd_of_birth == 20`
+* `pups_born_alive >= 2`
+* `pups_survive != 4`
+* `!(pups_survive == 4)`
+* `group %in% c("Con7", "Con8")`
+* `group == "Con7" & gd_of_birth == 20`
+
+A very common filtering step requires you to omit missing observations. You can do this with filter, but I recommend using `drop_na` from the `tidyr` package:
+
+* `drop_na(litters_data)` will remove any row with a missing value
+* `drop_na(litters_data, wt_increase)` will remove rows for which `wt_increase` is missing
+
+
+### `mutate`
+
+```{r}
+mutate(litters_data,
+  wt_gain = gd18_weight - gd0_weight,
+  group = str_to_lower(group))
+  # wt_gain_kg = wt_gain * 2.2
+```
+
+
+### `arrange`
+In comparison to the preceding, arranging is pretty straightforward. You can arrange the rows in your data according to the values in one or more columns:
+
+```{r}
+head(arrange(litters_data, group, pups_born_alive), 10)
+```
+
+
+### `%>%`
+
+We can (1) define intermediate datasets (or overwrite data at each stage)
+```{r}
+litters_data_raw = read_csv("./data/FAS_litters.csv",
+  col_types = "ccddiiii")
+litters_data_clean_names = janitor::clean_names(litters_data_raw)
+litters_data_selected_cols = select(litters_data_clean_names, -pups_survive)
+litters_data_with_vars = 
+  mutate(
+    litters_data_selected_cols, 
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group))
+litters_data_with_vars_without_missing = 
+  drop_na(litters_data_with_vars, wt_gain)
+litters_data_with_vars_without_missing
+```
+
+OR we can (2) nest function calls
+```{r}
+litters_data_clean = 
+  drop_na(
+    mutate(
+      select(
+        janitor::clean_names(
+          read_csv("./data/FAS_litters.csv", col_types = "ccddiiii")
+          ), 
+      -pups_survive
+      ),
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group)
+    ),
+  wt_gain
+  )
+
+litters_data_clean
+```
+
+*NOTE*: These are both confusing and bad: the first gets confusing and clutters our workspace, and the second has to be read inside out.
+
+Piping solves this problem. It allows you to turn the nested approach into a sequential chain by passing the result of one function call as an argument to the next function call:
+```{r}
+litters_data = 
+  read_csv("./data/FAS_litters.csv", col_types = "ccddiiii") %>%
+  janitor::clean_names() %>%
+  select(-pups_survive) %>%
+  mutate(
+    wt_gain = gd18_weight - gd0_weight,
+    group = str_to_lower(group)) %>% 
+  drop_na(wt_gain)
+
+litters_data
+```
+
+Using piping when not using a function in tidyverse
+```{r}
+litters_data %>%
+  lm(wt_gain ~ pups_born_alive, data = .) %>%
+  broom::tidy()
+```
+This doesn't operate on the "tibble in, tibble out" idea, but you can still use it. 
+Putting a '.' for data is telling R to take the previous thing and place it there. You can still use non-tidyverse functions with the piping as long as you use the period as the marker. `broom::tidy()` takes the output and makes it prettier... 
