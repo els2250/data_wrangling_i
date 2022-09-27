@@ -114,3 +114,44 @@ lotr_tidy <- bind_rows(fellowship_ring, two_towers, return_king) %>%
   mutate(race = str_to_lower(race))
 ```
 
+
+### Joining Datasets + using `separate`
+
+What we want to do: 
+
+* Separate group (con, mod, and low, and the day they received the alcohol) > two pieces of information in one column, and we want to separate them out
+
+
+```{r}
+pups <-
+  read_csv('data/FAS_pups.csv') %>% 
+  janitor::clean_names() %>% 
+  mutate(sex = recode(sex, `1` = "male", `2` = "female"))
+
+litter <-
+  read_csv('data/FAS_litters.csv') %>% 
+  janitor::clean_names() %>% 
+  separate(group, into = c('dose', 'day_of_tx'), sep = 3) %>% 
+    # sep = separate after the third character
+  mutate(
+    wt_gain = gd18_weight - gd0_weight,
+    dose = str_to_lower(dose)
+  )
+```
+
+Note: have to use " ` ` " (back quotes) to refer to a numeric value in a numeric variable.
+
+We're going to do `left_join` because we want the pup data to be joined to the mothers data >> we want to take the baby data and join mom's to that because our intent is to analyze the baby's data.
+
+```{r}
+fas_data <- 
+  left_join(pups, litter)
+```
+
+
+### `anti-join`
+This is a more elegant, tidyverse way of checking what you're dropping.
+```{r}
+anti_join(pups, litter)
+```
+

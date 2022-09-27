@@ -142,3 +142,85 @@ lotr_tidy <- bind_rows(fellowship_ring, two_towers, return_king) %>%
   ) %>% 
   mutate(race = str_to_lower(race))
 ```
+
+### Joining Datasets + using `separate`
+
+What we want to do:
+
+-   Separate group (con, mod, and low, and the day they received the
+    alcohol) \> two pieces of information in one column, and we want to
+    separate them out
+
+``` r
+pups <-
+  read_csv('data/FAS_pups.csv') %>% 
+  janitor::clean_names() %>% 
+  mutate(sex = recode(sex, `1` = "male", `2` = "female"))
+```
+
+    ## Rows: 313 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): Litter Number
+    ## dbl (5): Sex, PD ears, PD eyes, PD pivot, PD walk
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+litter <-
+  read_csv('data/FAS_litters.csv') %>% 
+  janitor::clean_names() %>% 
+  separate(group, into = c('dose', 'day_of_tx'), sep = 3) %>% 
+    # sep = separate after the third character
+  mutate(
+    wt_gain = gd18_weight - gd0_weight,
+    dose = str_to_lower(dose)
+  )
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+Note: have to use ” `` ” (back quotes) to refer to a numeric value in a
+numeric variable.
+
+We’re going to do `left_join` because we want the pup data to be joined
+to the mothers data \>\> we want to take the baby data and join mom’s to
+that because our intent is to analyze the baby’s data.
+
+``` r
+fas_data <- 
+  left_join(pups, litter)
+```
+
+    ## Joining, by = "litter_number"
+
+### `anti-join`
+
+This is a more elegant, tidyverse way of checking what you’re dropping.
+
+``` r
+anti_join(pups, litter)
+```
+
+    ## Joining, by = "litter_number"
+
+    ## # A tibble: 9 × 6
+    ##   litter_number sex    pd_ears pd_eyes pd_pivot pd_walk
+    ##   <chr>         <chr>    <dbl>   <dbl>    <dbl>   <dbl>
+    ## 1 #5/3/83/3-2   female       3      12       NA       8
+    ## 2 #5/3/83/3-2   female       3      13       NA      10
+    ## 3 #7/82/3-2     male         3      12        6       8
+    ## 4 #7/82/3-2     male         4      13        5       8
+    ## 5 #7/82/3-2     male         3      13        6       8
+    ## 6 #7/82/3-2     female       3      13        6       8
+    ## 7 #7/82/3-2     female       3      12        6       8
+    ## 8 #7/82/3-2     female       3      12        6       8
+    ## 9 #7/82/3-2     female       3      12        6       8
