@@ -66,5 +66,32 @@ litters_tidy_df <- litters_df %>%
   mutate(
     gd = recode(gd, "gd0_weight" = 0, "gd18_weight" = 18))
 ```
+Answer: Yes, this is relatively tidy. But this makes it harder to compute weight change, so it may not be as useful. 
+Need to think about what you want to do. Sometimes this can be better, sometimes you'll want it long. 
 
+
+### `pivot_wider`
+Creating tibble
+```{r}
+analysis_results <- tibble(
+  group = c('treatment', 'treatment', 'placebo', 'placebo'),
+  time = c('pre', 'post', 'pre', 'post'),
+  mean = c(4, 8, 3.5, 4)
+)
+```
+
+What if we want to change this into wide format? 
+```{r}
+analysis_results_wide <- pivot_wider(
+  analysis_results,
+  names_from = 'time',
+  values_from = 'mean'
+)
+```
+
+`names_from` = Column names are coming from the variable `time`
+`values_from` = Values come from the variable listed here that will move into the new variable
+
+
+### Lord of the Rings Exercise
 
