@@ -16,7 +16,7 @@ options(tibble.print_min = 5)
 ### Using `pivot_longer`
 ```{r}
 pulse_df <- haven::read_sas('data/public_pulse_data.sas7bdat') %>%
-  janitor::clean_names(pulse_df)
+  janitor::clean_names()
 ```
 Data shows ID, age at baseline, sex, and depression scores. Data is not tidy.
 We want to `pivot_longer`, take those columnns, stack them on top of each other, and create a new variable that indicates what visit we're at.
